@@ -28,7 +28,12 @@ else
 
 	cp -v arch/x86_64/boot/bzImage /boot/kernel
 fi
-lilo
+
+if command -v grub-install >/dev/null 2>&1; then
+	grub-install --efi-directory=/boot/efi
+else
+	lilo
+fi
 
 for d in /boot{/efi,}; do
 	if grep -qE "^[^#].+\s$d\s" /etc/fstab; then
