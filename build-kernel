@@ -20,10 +20,14 @@ for d in /boot{,/efi}; do
 	fi
 done
 
-mv -v /boot/kernel "/boot/kernel_$(date +%Y%m%d)_$(uname -r)"
-zcat /proc/config.gz > "/boot/kernel_$(date +%Y%m%d)_$(uname -r).conf"
+if [ -x /sbin/installkernel ]; then
+	make install
+else
+	mv -v /boot/kernel "/boot/kernel_$(date +%Y%m%d)_$(uname -r)"
+	zcat /proc/config.gz > "/boot/kernel_$(date +%Y%m%d)_$(uname -r).conf"
 
-cp -v arch/x86_64/boot/bzImage /boot/kernel
+	cp -v arch/x86_64/boot/bzImage /boot/kernel
+fi
 lilo
 
 for d in /boot{/efi,}; do
