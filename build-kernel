@@ -9,8 +9,10 @@ if [ ! -f .config ]; then
 	make olddefconfig
 fi
 
-make
-make modules_install
+threads=$(( $(nproc) * 3 / 4 ))
+
+make -j $threads
+make -j $threads modules_install
 
 mount /boot
 
