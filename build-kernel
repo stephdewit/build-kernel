@@ -14,7 +14,11 @@ threads=$(( $(nproc) * 3 / 4 ))
 make -j $threads
 make -j $threads modules_install
 
-mount /boot
+for d in /boot{,/efi}; do
+	if grep -qE "^[^#].+\s$d\s" /etc/fstab; then
+		mount "$d"
+	fi
+done
 
 mv -v /boot/kernel "/boot/kernel_$(date +%Y%m%d)_$(uname -r)"
 zcat /proc/config.gz > "/boot/kernel_$(date +%Y%m%d)_$(uname -r).conf"
@@ -22,4 +26,8 @@ zcat /proc/config.gz > "/boot/kernel_$(date +%Y%m%d)_$(uname -r).conf"
 cp -v arch/x86_64/boot/bzImage /boot/kernel
 lilo
 
-umount /boot
+for d in /boot{/efi,}; do
+	if grep -qE "^[^#].+\s$d\s" /etc/fstab; then
+		umount "$d"
+	fi
+done
